@@ -1,44 +1,28 @@
-import sys
-import os
+from dataclasses import dataclass, field
 import pandas as pd
-import numpy as np
 
-def load_validate(filename: str) -> pd.DataFrame:
-    if not filename.endswith(".csv"):
-        raise ValueError("Incorrect file extention.")
-    if not os.path.exists(filename):
-        raise FileExistsError("Given filename does not exists.")
-    if not os.path.isfile(filename):
-        raise FileNotFoundError("Given argument is not a file.")
-    if not os.access(filename, os.R_OK):
-        raise PermissionError("File is not readable.")
+@dataclass
+class Statistics:
+    df: pd.DataFrame
+    numeric_columns: dict = field(init=False, default_factory=dict)
+    # Maybe here is going to be additional things like:
+    #           - options to see the featrues for: numberical, object...
+    #           - ?...
+
+    series: pd.Series = field(init=False, default=None)
+
+    def __post_init__(self):
+        self.series = self._dfto_series(self.df)
+
+    def _dfto_series(self, df: pd.DataFrame):
+        for col_name, column in self.df.items():
+            # Check if column is numeric
+            if pd.api.types.is_numeric_dtype(column):
+                self.numeric_columns[col_name] = column
+                # Print moved inside the if statement so it only prints numeric columns
+                # print(f"Numeric column: {self.numeric_columns[col_name]}")
+        return self.numeric_columns
     
-    return pd.read_csv(filename)
+    def get_series(self):
+        return self.series
 
-
-def information(dataset: np.ndarray) -> None:
-    features = {
-        "Count" : "function to count for each datapoint",
-        "Mean" : "function to find mean fed",
-        "Std" : "function to find std fed",
-        "Min" : "function to find min fed",
-        "Quartile": "funciton to find 25% & 50% & 75% /fed",
-        "Max" : "function to find max fed"
-    }
-
-def main():
-    try:
-        if len(sys.argv) != 2:
-            raise ValueError("Incorrect arguemnt count.")
-        
-        dataset = load_validate(sys.argv[1])
-
-        information(dataset)
-        
-
-    except Exception as e:
-        print(f"{type(e).__name__}: {e}")
-
-
-if __name__ == "__main__":
-    main()
