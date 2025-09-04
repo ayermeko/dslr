@@ -38,10 +38,11 @@ def main():
         if len(sys.argv) != 2:
             raise ValueError("Incorrect arguemnt count.")
         
-        dataset = load_validate(sys.argv[1]) # We got Dataframe
+        dataset = load_validate(sys.argv[1])
         stat = Statistics(dataset)
+        information = stat.ft_describe()
 
-        print(stat.get_series())
+        print(information)
 
     except Exception as e:
         print(f"{type(e).__name__}: {e}")
