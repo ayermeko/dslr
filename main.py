@@ -42,7 +42,7 @@ def main():
         stat = Statistics(dataset)
         information = stat.ft_describe()
 
-        print(information)
+        print(f"{information}")
 
     except Exception as e:
         print(f"{type(e).__name__}: {e}")
