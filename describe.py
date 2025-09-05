@@ -5,7 +5,7 @@ import pandas as pd
 class Statistics:
     df: pd.DataFrame
 
-    numeric_columns: dict = field(init=False, default_factory=dict) # this is not a numberic, do not be confused
+    numeric_columns: dict = field(init=False, default_factory=dict)
     # Maybe here is going to be additional things like:
     #           - options to see the featrues for: numberical, object...
     #           - ?...
