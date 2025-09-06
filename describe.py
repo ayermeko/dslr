@@ -9,9 +9,9 @@ class Statistics:
 
     def __post_init__(self):
         """Post init stores converted values into a Series"""
-        self.series = self._dfto_series(self.df)
+        self.series = self._dfto_series()
 
-    def _dfto_series(self, df: pd.DataFrame):
+    def _dfto_series(self):
         """
         Checks if column values has type of dtype
         Stores int numberic columns with type of dict
@@ -62,6 +62,7 @@ class Statistics:
         return var ** 0.5
     
     def min_max(self, values, find):
+        """Finds min or max depending on find"""
         sorted_values = self.sorting_algorithm(values)
         if (find == 'min'):
             result = sorted_values[0]
@@ -69,7 +70,8 @@ class Statistics:
             result = sorted_values[-1]
         return result
 
-    def sorting_algorithm(self, values):
+    @staticmethod
+    def sorting_algorithm(values: list) -> list:
         for i in range(len(values) - 1):
             swapped = False
             for j in range(len(values) - i - 1):
@@ -99,7 +101,7 @@ class Statistics:
         fraction = idx - lower_idx
         return lower_val + fraction * (upper_val - lower_val)
 
-    def _format_results(self, results):
+    def _format_results(self, results: dict) -> dict:
         """Format results as a table"""
         if not results:
             return "No numerical features found."
