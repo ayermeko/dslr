@@ -4,18 +4,18 @@ import pandas as pd
 @dataclass
 class Statistics:
     df: pd.DataFrame
-
     numeric_columns: dict = field(init=False, default_factory=dict)
-    # Maybe here is going to be additional things like:
-    #           - options to see the featrues for: numberical, object...
-    #           - ?...
-
     series: pd.Series = field(init=False, default=None)
 
     def __post_init__(self):
+        """Post init stores converted values into a Series"""
         self.series = self._dfto_series(self.df)
 
     def _dfto_series(self, df: pd.DataFrame):
+        """
+        Checks if column values has type of dtype
+        Stores int numberic columns with type of dict
+        """
         for col_name, column in self.df.items():
             # Check if column is numeric
             if pd.api.types.is_numeric_dtype(column):
@@ -23,6 +23,11 @@ class Statistics:
         return self.numeric_columns
     
     def ft_describe(self):
+        """
+        Calls and stores each features of central tendency,
+        it does it inside of the results dict
+        and returns formated values.
+        """
         results = {}
 
         for col_name, col in self.numeric_columns.items():
@@ -35,38 +40,34 @@ class Statistics:
                 "Count": len(values),
                 "Mean": self.mean(values),
                 "Std": self.std(values),
-                "Min": self.min(values),
+                "Min": self.min_max(values, find="min"),
                 "25%": self.percentile(values, 25),
                 "50%": self.percentile(values, 50),
                 "75%": self.percentile(values, 75),
-                "Max": self.max(values)
+                "Max": self.min_max(values, find="max")
             }
 
         return self._format_results(results)
     
     def mean(self, values):
+        """Finds an average"""
         return sum(values) / len(values)
     
     def std(self, values):
+        """Finds standard deviation"""
         n = len(values)
         if n < 2:
             raise ValueError("Sample size lower then 2")
         var = sum((x - self.mean(values)) ** 2 for x in values) / (n - 1)
         return var ** 0.5
     
-    def min(self, values):
-        min_val = values[0]
-        for val in values:
-            if val < min_val:
-                min_val = val
-        return min_val
-    
-    def max(self, values):
-        min_val = values[0]
-        for val in values:
-            if val > min_val:
-                min_val = val
-        return min_val
+    def min_max(self, values, find):
+        sorted_values = self.sorting_algorithm(values)
+        if (find == 'min'):
+            result = sorted_values[0]
+        else:
+            result = sorted_values[-1]
+        return result
 
     def sorting_algorithm(self, values):
         for i in range(len(values) - 1):
